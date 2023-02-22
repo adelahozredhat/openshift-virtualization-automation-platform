@@ -18,8 +18,14 @@ waitpodup(){
   done
 }
 
-waitpod() {
+waitpodansibleautomationplatform() {
   NS=ansible-automation-platform
+  waitpodup $1 ${NS}
+  oc get pods -n ${NS} | grep ${1} | awk '{print "oc wait --for condition=Ready -n '${NS}' pod/" $1 " --timeout 300s"}' | sh
+}
+
+waitpodocpvir() {
+  NS=openshift-cnv
   waitpodup $1 ${NS}
   oc get pods -n ${NS} | grep ${1} | awk '{print "oc wait --for condition=Ready -n '${NS}' pod/" $1 " --timeout 300s"}' | sh
 }
@@ -30,25 +36,25 @@ oc new-project ansible-automation-platform
 
 echo "## INFO - Installing AAP Operators..."
 oc apply -f ./setup/files/aap_operator.yaml
-waitpod automation-controller-operator
-waitpod automation-hub-operator
-waitpod resource-operator
+waitpodansibleautomationplatform automation-controller-operator
+waitpodansibleautomationplatform automation-hub-operator
+waitpodansibleautomationplatform resource-operator
 
 ## Install AAP and Hub
 echo "## INFO - Installing AAP..."
 oc create secret generic aap-admin-credential --from-literal=password=${AAP_PASS}
 oc apply -f setup/files/aap.yaml
-waitpod aap-postgres
-waitpod aap
+waitpodansibleautomationplatform aap-postgres
+waitpodansibleautomationplatform aap
 
 echo "## INFO - Installing AAP Hub..."
 oc apply -f setup/files/hub.yaml
-waitpod hub-postgres
-waitpod hub-redis
-waitpod hub-content
-waitpod hub-worker
-waitpod hub-web
-waitpod hub-api
+waitpodansibleautomationplatform hub-postgres
+waitpodansibleautomationplatform hub-redis
+waitpodansibleautomationplatform hub-content
+waitpodansibleautomationplatform hub-worker
+waitpodansibleautomationplatform hub-web
+waitpodansibleautomationplatform hub-api
 
 AAP_ROUTE=$(oc get route aap -o jsonpath='{.status.ingress[0].host}')
 HUB_ROUTE=$(oc get route hub -o jsonpath='{.status.ingress[0].host}')
@@ -57,14 +63,35 @@ echo " - AAP: ${AAP_ROUTE} (User: admin/${AAP_PASS})"
 echo " - AAP Hub: ${HUB_ROUTE} (User: admin/${AAP_PASS})"
 
 
+
+
 echo "## INFO - Installing AAP Operators..."
 oc apply -f ./setup/files/ocp_virt_operator.yaml
-waitpod hco-operatorhub
-waitpod automation-hub-operator
-waitpod resource-operator
+waitpodocpvir bridge-marker
+waitpodocpvir cdi-apiserver
+waitpodocpvir cdi-deployment
+waitpodocpvir cdi-operator
+waitpodocpvir cdi-uploadproxy
+waitpodocpvir cluster-network-addons-operator
+waitpodocpvir hco-operator
+waitpodocpvir hco-webhook
+waitpodocpvir hostpath-provisioner-operator
+waitpodocpvir hyperconverged-cluster-cli-download
+waitpodocpvir kube-cni-linux-bridge-plugin
+waitpodocpvir kubemacpool-cert-manager
+waitpodocpvir kubemacpool-mac-controller-manager
+waitpodocpvir nmstate-cert-manager
+waitpodocpvir nmstate-handler
+waitpodocpvir nmstate-webhook
+waitpodocpvir node-maintenance-operator
+waitpodocpvir ssp-operator
+waitpodocpvir virt-api
+waitpodocpvir virt-controller
+waitpodocpvir virt-handler
+waitpodocpvir virt-operator
+waitpodocpvir virt-template-validator
+
+
 
 echo "## INFO - Installing AAP Operators..."
 oc apply -f ./setup/files/hyper_converged.yaml
-waitpod hco-operatorhub
-waitpod automation-hub-operator
-waitpod resource-operator
