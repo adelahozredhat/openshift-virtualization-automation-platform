@@ -67,31 +67,31 @@ echo " - AAP Hub: ${HUB_ROUTE} (User: admin/${AAP_PASS})"
 
 echo "## INFO - Installing AAP Operators..."
 oc apply -f ./setup/files/ocp_virt_operator.yaml
-waitpodocpvir bridge-marker
-waitpodocpvir cdi-apiserver
-waitpodocpvir cdi-deployment
 waitpodocpvir cdi-operator
-waitpodocpvir cdi-uploadproxy
 waitpodocpvir cluster-network-addons-operator
 waitpodocpvir hco-operator
 waitpodocpvir hco-webhook
 waitpodocpvir hostpath-provisioner-operator
 waitpodocpvir hyperconverged-cluster-cli-download
+waitpodocpvir node-maintenance-operator
+waitpodocpvir ssp-operator
+waitpodocpvir virt-operator
+
+
+
+echo "## INFO - Installing AAP Operators..."
+oc apply -f ./setup/files/hyper_converged.yaml
+waitpodocpvir cdi-apiserver
+waitpodocpvir cdi-deployment
+waitpodocpvir bridge-marker
+waitpodocpvir cdi-uploadproxy
 waitpodocpvir kube-cni-linux-bridge-plugin
 waitpodocpvir kubemacpool-cert-manager
 waitpodocpvir kubemacpool-mac-controller-manager
 waitpodocpvir nmstate-cert-manager
 waitpodocpvir nmstate-handler
 waitpodocpvir nmstate-webhook
-waitpodocpvir node-maintenance-operator
-waitpodocpvir ssp-operator
 waitpodocpvir virt-api
 waitpodocpvir virt-controller
 waitpodocpvir virt-handler
-waitpodocpvir virt-operator
 waitpodocpvir virt-template-validator
-
-
-
-echo "## INFO - Installing AAP Operators..."
-oc apply -f ./setup/files/hyper_converged.yaml
